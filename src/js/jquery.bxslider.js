@@ -178,10 +178,14 @@
       if (slider.settings.mode === 'vertical') { slider.settings.maxSlides = slider.settings.minSlides; }
       // save original style data
       // el.data('origStyle', el.attr('style'));
-      el.get(0).origStyle = el.attr('style');
+      if (typeof el.get(0).origStyle === "undefined") {
+        el.get(0).origStyle = el.attr('style') || null;
+      }
       el.children(slider.settings.slideSelector).each(function() {
         // $(this).data('origStyle', $(this).attr('style'));
-        $(this).get(0).origStyle = $(this).attr('style');
+        if (typeof $(this).get(0).origStyle === "undefined") {
+          $(this).get(0).origStyle = $(this).attr('style') || null;
+        }
       });
 
       // perform all DOM / CSS modifications
@@ -210,7 +214,10 @@
       // also strip any margin and padding from el
       el.css({
         width: slider.settings.mode === 'horizontal' ? (slider.children.length * 1000 + 215) + '%' : 'auto',
-        position: 'relative'
+        position: 'relative',
+        display: 'block',
+        marginLeft: 0,
+        marginRight: 0
       });
       // if using CSS, add the easing property
       if (slider.usingCSS && slider.settings.easing) {
@@ -1559,7 +1566,7 @@
       // don't do anything if slider has already been destroyed
       if (!slider.initialized) { return; }
       slider.initialized = false;
-      $('.bx-clone', this).remove();
+      $('.bx-clone', el).remove();
       slider.children.each(function() {
         // if ($(this).data('origStyle') !== undefined) {
         if (typeof $(this).get(0).origStyle !== undefined) {
@@ -1574,21 +1581,21 @@
         // this.attr('style', $(this).data('origStyle'));
         el.attr('style', el.get(0).origStyle);
       } else {
-        $(this).removeAttr('style');
+        el.removeAttr('style');
       }
-      $(this).unwrap().unwrap();
+      el.unwrap().unwrap();
       if (slider.controls.el) { slider.controls.el.remove(); }
       if (slider.controls.next) { slider.controls.next.remove(); }
       if (slider.controls.prev) { slider.controls.prev.remove(); }
       if (slider.pagerEl && slider.settings.controls && !slider.settings.pagerCustom) { slider.pagerEl.remove(); }
-      $('.bx-caption', this).remove();
+      $('.bx-caption', el).remove();
       if (slider.controls.autoEl) { slider.controls.autoEl.remove(); }
       clearInterval(slider.interval);
       if (slider.settings.responsive) { $(window).unbind('resize', resizeWindow); }
       if (slider.settings.keyboardEnabled) { $(document).unbind('keydown', keyPress); }
       //remove self reference in data
-      $(this).removeData('bxSlider');
-      delete $(el).get(0).bxSlider;
+      el.removeData('bxSlider');
+      delete el.get(0).bxSlider;
     };
 
     /**
